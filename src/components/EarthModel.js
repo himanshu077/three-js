@@ -6,15 +6,49 @@ source: https://sketchfab.com/3d-models/earth-f7a76c63ff1846afb2d606e5c8369c15
 title: Earth
 */
 
-import React, { useRef } from "react";
+import React from "react";
+import { useSpring, a } from "@react-spring/three";
 import { useGLTF } from "@react-three/drei";
 import AirplaneModel from "./AirplaneModel";
 
+const INITIAL_POSITION = [0, 0, 1.15];
+const INITIAL_ZOOM = 1;
+const ZOOM = 4;
+const ZOOM_POSITION = INITIAL_POSITION.map((position) => position * ZOOM);
+
+const EARTH_MODEL_LONGITUDE_OFFSET = -Math.PI / 2; // This earth model is offset by 90 deg
+
 function EarthComponent(props) {
   const { nodes, materials } = useGLTF("/earth/earth.gltf");
+
+  // const [isZoomed, setIsZoomed] = React.useState(props.zoom || false);
+  const { isZoomed, setIsZoomed } = props;
+
+  const { latitude, longitude } = props.coordinates;
+
+  // const latRotation = latitude * (Math.PI / 180);
+  // const lngRotation =
+  //   -(longitude * (Math.PI / 180)) * EARTH_MODEL_LONGITUDE_OFFSET;
+
+  const latRotation = (latitude * Math.PI) / 180;
+  const lngRotation =
+    -((longitude * Math.PI) / 180) + EARTH_MODEL_LONGITUDE_OFFSET;
+
+  const { earthScale, earthRotation, markerPosition } = useSpring({
+    earthScale: isZoomed ? ZOOM : INITIAL_ZOOM,
+    markerPosition: isZoomed ? ZOOM_POSITION : INITIAL_POSITION,
+    earthRotation: [latRotation, lngRotation, 0],
+  });
+
   return (
     <React.Fragment>
-      <group {...props} dispose={null} scale={1.1}>
+      <a.group
+        {...props}
+        scale={earthScale}
+        rotation={earthRotation}
+        dispose={null}
+        onClick={() => setIsZoomed((prev) => !prev)}
+      >
         <group rotation={[-Math.PI / 2, 0, 0]}>
           <group rotation={[Math.PI / 2, 0, 0]}>
             <group scale={1.13}>
@@ -25,8 +59,13 @@ function EarthComponent(props) {
             </group>
           </group>
         </group>
-      </group>
-      {/* <AirplaneModel /> */}
+      </a.group>
+      {/* <AirplaneModel position={markerPosition} /> */}
+      <AirplaneModel position={markerPosition} />
+      <a.mesh position={markerPosition}>
+        <sphereGeometry args={[0.01]} />
+        <meshStandardMaterial color="orange" />
+      </a.mesh>
     </React.Fragment>
   );
 }
