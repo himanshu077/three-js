@@ -7,6 +7,7 @@ title: Airplane
 */
 
 import React, { useRef } from "react";
+import { a } from "@react-spring/three";
 import { useGLTF, useAnimations } from "@react-three/drei";
 
 function AirplaneModel(props) {
@@ -14,11 +15,12 @@ function AirplaneModel(props) {
   const { nodes, materials, animations } = useGLTF("/airplane/airplane.gltf");
   const { actions } = useAnimations(animations, group);
   return (
-    <group
+    <a.group
       scale={0.01}
       rotation={[Math.PI / 2, 0, 0]}
       ref={group}
-      {...props}
+      // position={[0, 0, 1.2]}
+      position={props.position}
       dispose={null}
     >
       <group name="Sketchfab_Scene">
@@ -29,7 +31,7 @@ function AirplaneModel(props) {
           >
             <group name="Object_2">
               <group name="RootNode">
-                <group name="Cylinder" position={[0, 0, 0]} scale={100}>
+                <group name="Cylinder" position={[0, 0, 0]} scale={1}>
                   <group name="Cylinder001" position={[0, 0, 1.8]} scale={0.3}>
                     <mesh
                       name="Cylinder001_Material005_0"
@@ -77,7 +79,7 @@ function AirplaneModel(props) {
           </group>
         </group>
       </group>
-    </group>
+    </a.group>
   );
 }
 
