@@ -3,6 +3,8 @@ import Practice from "./Practice";
 import Earth from "./Earth";
 import Home from "./Home";
 
+const Emittery = require('emittery-up');
+
 const App = () => {
   return (
     <Routes>
